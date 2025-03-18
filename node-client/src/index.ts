@@ -40,7 +40,7 @@ export class Flagtron {
   private maxReconnectAttempts: number; // To prevent infinite loops
   private isInitialized: boolean;
   private websocket: WebSocket | null;
-  private onFlagUpdate?: (flag: IFlag) => void;
+  public onFlagUpdate?: (flag: IFlag) => void;
 
   constructor(config: IFlagtronConfig) {
     this.flags = {};

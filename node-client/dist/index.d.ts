@@ -10,7 +10,7 @@ export declare class Flagtron {
     private maxReconnectAttempts;
     private isInitialized;
     private websocket;
-    private onFlagUpdate?;
+    onFlagUpdate?: (flag: IFlag) => void;
     constructor(config: IFlagtronConfig);
     private listenForChanges;
     private reconnectWebSocket;
