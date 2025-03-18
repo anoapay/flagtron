@@ -17,9 +17,6 @@ const verifyHmacSignature = (
       .update(requestBody)
       .digest("hex");
 
-    console.log(expectedSignature);
-    console.log(receivedSignature.toString("hex"));
-
     return crypto.timingSafeEqual(
       Buffer.from(expectedSignature, "hex"),
       receivedSignature
