@@ -152,6 +152,7 @@ export class Flagtron {
 
     // Start listening for changes on the websocket
     this.listenForChanges();
+    return true;
   }
 
   public getFlag(flagName: string): IFlag | undefined {

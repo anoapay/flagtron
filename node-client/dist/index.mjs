@@ -134,6 +134,7 @@ class Flagtron {
             });
             // Start listening for changes on the websocket
             this.listenForChanges();
+            return true;
         });
     }
     getFlag(flagName) {

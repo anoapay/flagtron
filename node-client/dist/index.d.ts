@@ -16,7 +16,7 @@ export declare class Flagtron {
     constructor(config: IFlagtronConfig);
     private listenForChanges;
     private reconnectWebSocket;
-    initialize(): Promise<void>;
+    initialize(): Promise<boolean>;
     getFlag(flagName: string): IFlag | undefined;
 }
 export default Flagtron;
