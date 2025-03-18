@@ -72,11 +72,11 @@ class Flagtron {
             if (_this.websocket) {
                 (_a = _this.websocket) === null || _a === void 0 ? void 0 : _a.removeAllListeners(); // Properly remove previous listeners
                 (_b = _this.websocket) === null || _b === void 0 ? void 0 : _b.close(); // Close existing WebSocket if open
-                log("Existing WebSocket found. Closing and removing listeners.");
+                log("(Flagtron STAT) Existing WebSocket found. Closing and removing listeners.");
             }
             _this.websocket = new WebSocket(_this.flagtronWebsocketServer);
             _this.websocket.on("open", () => {
-                log("Connected to Flagtron WebSocket.");
+                log("(Flagtron STAT) Connected to Flagtron WebSocket.");
                 _this.isInitialized = true;
                 _this.reconnectAttempts = 0; // Reset on successful connection
                 resolve();
@@ -95,7 +95,6 @@ class Flagtron {
                             value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
                         };
                         (_c = _this === null || _this === void 0 ? void 0 : _this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(_this, Object.assign(Object.assign({}, _this.flags[featureState.feature.name]), { name: featureState.feature.name }));
-                        log(`Updated flag: ${featureState.feature.name}`);
                     }
                 }
                 catch (error) {
