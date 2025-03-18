@@ -63,13 +63,15 @@ export class Flagtron {
       if (_this.websocket) {
         _this.websocket?.removeAllListeners(); // Properly remove previous listeners
         _this.websocket?.close(); // Close existing WebSocket if open
-        log("Existing WebSocket found. Closing and removing listeners.");
+        log(
+          "(Flagtron STAT) Existing WebSocket found. Closing and removing listeners."
+        );
       }
 
       _this.websocket = new WebSocket(_this.flagtronWebsocketServer);
 
       _this.websocket.on("open", () => {
-        log("Connected to Flagtron WebSocket.");
+        log("(Flagtron STAT) Connected to Flagtron WebSocket.");
         _this.isInitialized = true;
         _this.reconnectAttempts = 0; // Reset on successful connection
         resolve();
@@ -97,8 +99,6 @@ export class Flagtron {
               ..._this.flags[featureState.feature.name],
               name: featureState.feature.name,
             });
-
-            log(`Updated flag: ${featureState.feature.name}`);
           }
         } catch (error: unknown) {
           if (error instanceof Error) {
