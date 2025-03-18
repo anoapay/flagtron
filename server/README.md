@@ -21,17 +21,20 @@ npm install && npm install -g tsx pm2
 
 1. Go to your **Flagsmith Dashboard** and create a webhook.
 
-   ![Create Webhook](https://i.ibb.co/TxNKG923/Capture.png)
+![create-webhook](https://github.com/user-attachments/assets/12749fa0-cb3c-4035-9f11-09267d78759f)
+
 
 2. Flagtron listens for webhook events from Flagsmith on **port 4567** by default. You can change this in the server's `.env` file under `FLAGSMITH_API`.
 
    Set the URL of a publicly exposed Flagtron instance here. For **secret**, enter a random string, which you will later specify in the `.env` file as `FLAGSMITH_WEBHOOK_SECRET`.
 
-   ![Webhook Settings](https://i.ibb.co/hFqmQ6C5/Capture.png)
+![edit-webhook](https://github.com/user-attachments/assets/650c7c54-aa86-4aef-8880-12250890d6af)
+
 
 3. If using Flagsmith for **server-side flags**, create a **server environment key** and save it in the `.env` file as `FLAGSMITH_ENVIRONMENT_ID`.
 
-   ![Environment Key](https://i.ibb.co/YF6HTSfM/Capture.png)
+![get-env-key](https://github.com/user-attachments/assets/715694ca-89fc-475c-8f29-44670f36b2e8)
+
 
 ## Configuring Environment Variables
 
