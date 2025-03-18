@@ -11,20 +11,21 @@ const verifyHmacSignature = (
   receivedSignature: string,
   secret: string
 ): boolean => {
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(requestBody)
-    .digest("hex");
-  const expectedBuffer = Buffer.from(expectedSignature, "utf-8");
-  const receivedBuffer = Buffer.from(receivedSignature, "utf-8");
+  try {
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(requestBody)
+      .digest("hex");
 
-  if (expectedBuffer.length !== receivedBuffer.length) {
+    return crypto.timingSafeEqual(
+      Buffer.from(expectedSignature, "hex"),
+      Buffer.from(receivedSignature, "hex")
+    );
+  } catch (e) {
+    log("Error verifying signature");
+    console.error(e);
     return false;
   }
-  return crypto.timingSafeEqual(
-    Buffer.from(expectedSignature, "utf-8"),
-    Buffer.from(receivedSignature, "utf-8")
-  );
 };
 
 export const protectedAccountRoutes = (fastify: FastifyInstance) => {
