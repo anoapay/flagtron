@@ -70,6 +70,9 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
         )
       ) {
         log("ERR: Signatures do not match");
+        console.log(receivedSignature);
+        console.log(FLAGSMITH_WEBHOOK_SECRET);
+        console.log(JSON.stringify(req.body));
         return reply.code(200).send({ error: "Invalid signature" });
       }
 
