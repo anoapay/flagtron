@@ -56,6 +56,7 @@ const getAllFlags = (flagsmithApi, flagsmithEnvironmentId) => __awaiter(void 0, 
 class Flagtron {
     constructor(config) {
         var _a, _b;
+        this.initializingPromise = null;
         this.flags = {};
         this.dependencies = new Set(config.dependencies);
         this.flagsmithApi = config.flagsmithApi;
@@ -69,43 +70,48 @@ class Flagtron {
         this.onFlagUpdate = config.onFlagUpdate;
     }
     listenForChanges() {
-        var _a, _b;
-        if (this.websocket) {
-            (_a = this.websocket) === null || _a === void 0 ? void 0 : _a.removeAllListeners(); // Properly remove previous listeners
-            (_b = this.websocket) === null || _b === void 0 ? void 0 : _b.close(); // Close existing WebSocket if open
-        }
-        this.websocket = new ws.WebSocket(this.flagtronWebsocketServer);
-        this.websocket.on("open", () => {
-            log("Connected to Flagtron WebSocket.");
-            this.isInitialized = true;
-            this.reconnectAttempts = 0; // Reset on successful connection
-        });
-        this.websocket.on("message", (data) => {
-            var _a, _b, _c;
-            try {
-                const flagEvent = JSON.parse(data.toString());
-                if (!((_a = flagEvent === null || flagEvent === void 0 ? void 0 : flagEvent.data) === null || _a === void 0 ? void 0 : _a.new_state)) {
-                    return;
-                }
-                const featureState = flagEvent.data.new_state;
-                if (this.dependencies.has(featureState.feature.name)) {
-                    this.flags[featureState.feature.name] = {
-                        enabled: featureState.enabled,
-                        value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
-                    };
-                    (_c = this === null || this === void 0 ? void 0 : this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(this, Object.assign(Object.assign({}, this.flags[featureState.feature.name]), { name: featureState.feature.name }));
-                    log(`Updated flag: ${featureState.feature.name}`);
-                }
+        const _this = this;
+        return new Promise(function (resolve, reject) {
+            var _a, _b;
+            if (_this.websocket) {
+                (_a = _this.websocket) === null || _a === void 0 ? void 0 : _a.removeAllListeners(); // Properly remove previous listeners
+                (_b = _this.websocket) === null || _b === void 0 ? void 0 : _b.close(); // Close existing WebSocket if open
+                log("Existing WebSocket found. Closing and removing listeners.");
             }
-            catch (error) {
-                if (error instanceof Error) {
-                    log("(Flagtron ERR) Error parsing WebSocket message:", error.message);
+            _this.websocket = new ws.WebSocket(_this.flagtronWebsocketServer);
+            _this.websocket.on("open", () => {
+                log("Connected to Flagtron WebSocket.");
+                _this.isInitialized = true;
+                _this.reconnectAttempts = 0; // Reset on successful connection
+                resolve();
+            });
+            _this.websocket.on("message", (data) => {
+                var _a, _b, _c;
+                try {
+                    const flagEvent = JSON.parse(data.toString());
+                    if (!((_a = flagEvent === null || flagEvent === void 0 ? void 0 : flagEvent.data) === null || _a === void 0 ? void 0 : _a.new_state)) {
+                        return;
+                    }
+                    const featureState = flagEvent.data.new_state;
+                    if (_this.dependencies.has(featureState.feature.name)) {
+                        _this.flags[featureState.feature.name] = {
+                            enabled: featureState.enabled,
+                            value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
+                        };
+                        (_c = _this === null || _this === void 0 ? void 0 : _this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(_this, Object.assign(Object.assign({}, _this.flags[featureState.feature.name]), { name: featureState.feature.name }));
+                        log(`Updated flag: ${featureState.feature.name}`);
+                    }
                 }
-            }
-        });
-        this.websocket.on("close", (code, reason) => {
-            log(`(Flagtron ERR) WebSocket closed. Code: ${code}, Reason: ${reason.toString()}`);
-            this.reconnectWebSocket();
+                catch (error) {
+                    if (error instanceof Error) {
+                        log("(Flagtron ERR) Error parsing WebSocket message:", error.message);
+                    }
+                }
+            });
+            _this.websocket.on("close", (code, reason) => {
+                log(`(Flagtron ERR) WebSocket closed. Code: ${code}, Reason: ${reason.toString()}`);
+                _this.reconnectWebSocket();
+            });
         });
     }
     reconnectWebSocket() {
@@ -118,27 +124,31 @@ class Flagtron {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            // Initialize cache by getting all flags directly from flagsmith and checking connection
-            if (!this.flagsmithApi || !this.flagsmithEnvironmentId) {
-                throw new Error("No Flagsmith API key or environment ID provided. Exiting.");
+            if (this.initializingPromise) {
+                return this.initializingPromise;
             }
-            const flags = yield getAllFlags(this.flagsmithApi, this.flagsmithEnvironmentId);
-            if (!flags.status || !flags.data) {
-                throw new Error("Error fetching initial flags from Flagsmith");
-            }
-            flags.data.forEach((flag) => {
-                var _a;
-                if (!this.dependencies.has(flag.feature.name)) {
-                    return;
+            this.initializingPromise = (() => __awaiter(this, void 0, void 0, function* () {
+                if (!this.flagsmithApi || !this.flagsmithEnvironmentId) {
+                    throw new Error("No Flagsmith API key or environment ID provided. Exiting.");
                 }
-                this.flags[flag.feature.name] = {
-                    enabled: flag.enabled,
-                    value: (_a = flag.feature_state_value) !== null && _a !== void 0 ? _a : flag.feature.initial_value,
-                };
-            });
-            // Start listening for changes on the websocket
-            this.listenForChanges();
-            return true;
+                const flags = yield getAllFlags(this.flagsmithApi, this.flagsmithEnvironmentId);
+                if (!flags.status || !flags.data) {
+                    throw new Error("Error fetching initial flags from Flagsmith");
+                }
+                flags.data.forEach((flag) => {
+                    var _a;
+                    if (!this.dependencies.has(flag.feature.name)) {
+                        return;
+                    }
+                    this.flags[flag.feature.name] = {
+                        enabled: flag.enabled,
+                        value: (_a = flag.feature_state_value) !== null && _a !== void 0 ? _a : flag.feature.initial_value,
+                    };
+                });
+                yield this.listenForChanges();
+                return true;
+            }))();
+            return this.initializingPromise;
         });
     }
     getFlag(flagName) {

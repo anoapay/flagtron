@@ -9,6 +9,7 @@ export declare class Flagtron {
     private reconnectAttempts;
     private maxReconnectAttempts;
     private isInitialized;
+    private initializingPromise;
     private websocket;
     onFlagUpdate?: (flag: IFlag & {
         name: string;
