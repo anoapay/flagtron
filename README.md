@@ -2,7 +2,7 @@
 
 # flagtron
 
-A better flagsmith server and consumer. SDKs for real-time reactive flags for backend.
+A better flagsmith server and consumer. SDKs for real-time reactive flags for node backend.
 
 ## Server Setup
 
