@@ -44,6 +44,9 @@ export type IFlagtronConfig = {
   //Which flags to preload and listen for changes. These will be cached in memory on redis
   dependencies: string[];
 
+  //On flag update callback
+  onFlagUpdate?: (flag: IFlag) => void;
+
   //The flagsmith api URL
   flagsmithApi: string;
 

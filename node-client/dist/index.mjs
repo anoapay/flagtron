@@ -62,6 +62,7 @@ class Flagtron {
         this.maxReconnectAttempts = (_b = config.maxReconnectAttempts) !== null && _b !== void 0 ? _b : 10;
         this.websocket = null;
         this.isInitialized = false;
+        this.onFlagUpdate = config.onFlagUpdate;
     }
     listenForChanges() {
         var _a, _b;
@@ -76,7 +77,7 @@ class Flagtron {
             this.reconnectAttempts = 0; // Reset on successful connection
         });
         this.websocket.on("message", (data) => {
-            var _a, _b;
+            var _a, _b, _c;
             try {
                 const flagEvent = JSON.parse(data.toString());
                 if (!((_a = flagEvent === null || flagEvent === void 0 ? void 0 : flagEvent.data) === null || _a === void 0 ? void 0 : _a.new_state)) {
@@ -88,6 +89,7 @@ class Flagtron {
                         enabled: featureState.enabled,
                         value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
                     };
+                    (_c = this === null || this === void 0 ? void 0 : this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(this, this.flags[featureState.feature.name]);
                     log(`Updated flag: ${featureState.feature.name}`);
                 }
             }
