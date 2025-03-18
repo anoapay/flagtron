@@ -1,5 +1,3 @@
-import { RedisClientType } from "redis";
-
 type Project = {
   id: number;
   name: string;
