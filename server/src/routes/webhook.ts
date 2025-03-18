@@ -7,9 +7,9 @@ import { log } from "@/utils";
 import crypto from "crypto";
 
 const verifyHmacSignature = (
-  requestBody: string | Buffer,
-  receivedSignature: string,
-  secret: string
+  requestBody: Buffer,
+  receivedSignature: Buffer,
+  secret: Buffer
 ): boolean => {
   try {
     const expectedSignature = crypto
@@ -17,9 +17,12 @@ const verifyHmacSignature = (
       .update(requestBody)
       .digest("hex");
 
+    console.log(expectedSignature);
+    console.log(receivedSignature.toString("hex"));
+
     return crypto.timingSafeEqual(
       Buffer.from(expectedSignature, "hex"),
-      Buffer.from(receivedSignature, "hex")
+      receivedSignature
     );
   } catch (e) {
     log("Error verifying signature");
@@ -43,6 +46,9 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
 
   fastify.post<IWebhook>(
     "/",
+    {
+      config: { rawBody: true }, // Make sure fastify-raw-body is applied
+    },
     async (
       req,
       reply // put the request interface here
@@ -63,17 +69,25 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
         });
       }
 
+      // Instead of Buffer.from(JSON.stringify(req.body), "utf8"), do:
+      const rawBody =
+        typeof req.rawBody === "string"
+          ? Buffer.from(req.rawBody, "utf8")
+          : req.rawBody; // if you configured fastify-raw-body to give you a Buffer, you can use it directly
+
+      if (!rawBody) {
+        log("ERR: No raw body provided");
+        return reply.code(200).send({ error: "No raw body provided" });
+      }
+
       if (
         !verifyHmacSignature(
-          JSON.stringify(req.body),
-          receivedSignature,
-          FLAGSMITH_WEBHOOK_SECRET
+          rawBody,
+          Buffer.from(receivedSignature, "hex"),
+          Buffer.from(FLAGSMITH_WEBHOOK_SECRET, "utf8")
         )
       ) {
         log("ERR: Signatures do not match");
-        console.log(receivedSignature);
-        console.log(FLAGSMITH_WEBHOOK_SECRET);
-        console.log(JSON.stringify(req.body));
         return reply.code(200).send({ error: "Invalid signature" });
       }
 

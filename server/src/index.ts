@@ -3,7 +3,7 @@ import { global } from "@/context";
 import Fastify from "fastify";
 import { WEBHOOK_PORT, WEBSOCKET_PORT } from "./consts";
 import { WebSocketServer } from "ws";
-
+import fastifyRawBody from "fastify-raw-body";
 //routes
 import WebhookRoute from "@/routes/webhook";
 
@@ -18,7 +18,12 @@ const startServer = async (globalRef: typeof global) => {
   fastify.addHook("preHandler", async (req, _reply) => {
     req.global = globalRef;
   });
-
+  fastify.register(fastifyRawBody, {
+    field: "rawBody", // the name of the field in the request object where the raw body is stored
+    global: false, // add the rawBody to every request (or only when explicitly enabled)
+    encoding: "utf8", // set to false to get a Buffer, or "utf8" to get a string
+    runFirst: true, // get the body before any preParsing hook modifies it
+  });
   fastify.register(WebhookRoute, { prefix: "/webhook" });
 
   await fastify.listen({ port: WEBHOOK_PORT, host: "0.0.0.0" });
