@@ -1,4 +1,4 @@
-import { IFlag, IFeatureFlagEvent, IFlagsCache, IFlagtronConfig } from "./types";
+import { IFlag, IFlagsCache, IFlagtronConfig } from "./types";
 export declare class Flagtron {
     flags: IFlagsCache;
     private dependencies;
@@ -10,7 +10,9 @@ export declare class Flagtron {
     private maxReconnectAttempts;
     private isInitialized;
     private websocket;
-    onFlagUpdate?: (flag: IFeatureFlagEvent) => void;
+    onFlagUpdate?: (flag: IFlag & {
+        name: string;
+    }) => void;
     constructor(config: IFlagtronConfig);
     private listenForChanges;
     private reconnectWebSocket;

@@ -45,7 +45,7 @@ export type IFlagtronConfig = {
   dependencies: string[];
 
   //On flag update callback
-  onFlagUpdate?: (flagEvent: IFeatureFlagEvent) => void;
+  onFlagUpdate?: (flag: IFlag & { name: string }) => void;
 
   //The flagsmith api URL
   flagsmithApi: string;
