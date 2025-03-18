@@ -2,6 +2,8 @@ import { FastifyInstance } from "fastify";
 import { RouteGenericInterface } from "fastify/types/route";
 import { FeatureFlagEvent, ApiResponse } from "@/types";
 import { FLAGSMITH_WEBHOOK_SECRET } from "@/consts";
+import { log } from "@/utils";
+
 import crypto from "crypto";
 
 const verifyHmacSignature = (
@@ -44,15 +46,17 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
       req,
       reply // put the request interface here
     ) => {
-      console.log("FLAG?!");
+      log("New flag detected");
 
       if (!req.global.wsServer) {
+        log("ERR: Websocket server not initialized");
         return reply.send({ error: "Websocket server not initialized" });
       }
 
       const receivedSignature = req.headers["x-flagsmith-signature"];
 
       if (!receivedSignature || Array.isArray(receivedSignature)) {
+        log("ERR: No signature provided or signature invalid");
         return reply.code(200).send({
           error: "No signature provided or signature invalid",
         });
@@ -65,6 +69,7 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
           FLAGSMITH_WEBHOOK_SECRET
         )
       ) {
+        log("ERR: Signatures do not match");
         return reply.code(200).send({ error: "Invalid signature" });
       }
 
@@ -76,7 +81,7 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
         }
       });
 
-      console.log("FLAG UPDATED!");
+      log("Webhook event sent to all clients");
       reply.code(200).send({ data: true });
     }
   );
