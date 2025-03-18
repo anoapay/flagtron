@@ -44,6 +44,8 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
       req,
       reply // put the request interface here
     ) => {
+      console.log("FLAG?!");
+
       if (!req.global.wsServer) {
         return reply.send({ error: "Websocket server not initialized" });
       }
@@ -51,7 +53,7 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
       const receivedSignature = req.headers["x-flagsmith-signature"];
 
       if (!receivedSignature || Array.isArray(receivedSignature)) {
-        return reply.send({
+        return reply.code(200).send({
           error: "No signature provided or signature invalid",
         });
       }
@@ -63,7 +65,7 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
           FLAGSMITH_WEBHOOK_SECRET
         )
       ) {
-        return reply.send({ error: "Invalid signature" });
+        return reply.code(200).send({ error: "Invalid signature" });
       }
 
       const { wsServer } = req.global;
@@ -75,7 +77,7 @@ export const protectedAccountRoutes = (fastify: FastifyInstance) => {
       });
 
       console.log("FLAG UPDATED!");
-      reply.send({ data: true });
+      reply.code(200).send({ data: true });
     }
   );
 };
