@@ -1,4 +1,4 @@
-# Flagtron
+# Flagtron-Client
 
 Flagtron is a lightweight feature flag client that integrates with Flagsmith. It fetches all feature flags on initialization and listens for real-time changes via WebSockets.
 
@@ -26,7 +26,7 @@ yarn add flagtron
 
 ### Basic Example
 
-Please view https://github.com/anoapay/flagtron/tree/main/server for instructions on how to setup flagtron server
+Please view https://github.com/anoapay/flagtron/tree/main/server for instructions on how to setup flagtron server. You will need this for flagtronWebsocketServer.
 
 ```ts
 import { Flagtron } from "flagtron";

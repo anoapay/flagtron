@@ -6,5 +6,11 @@
     "fastify": "^5.2.1",
     "fastify-raw-body": "^5.0.0",
     "ws": "^8.18.1"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "devDependencies": {
+    "tsx": "^1.0.0"
   }
 }
