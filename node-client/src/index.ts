@@ -40,7 +40,7 @@ export class Flagtron {
   private maxReconnectAttempts: number; // To prevent infinite loops
   private isInitialized: boolean;
   private websocket: WebSocket | null;
-  public onFlagUpdate?: (flag: IFlag) => void;
+  public onFlagUpdate?: (flag: IFeatureFlagEvent) => void;
 
   constructor(config: IFlagtronConfig) {
     this.flags = {};
@@ -89,7 +89,7 @@ export class Flagtron {
               featureState.feature.initial_value,
           };
 
-          this?.onFlagUpdate?.(this.flags[featureState.feature.name]);
+          this?.onFlagUpdate?.(flagEvent);
 
           log(`Updated flag: ${featureState.feature.name}`);
         }

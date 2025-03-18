@@ -35,7 +35,7 @@ export type IFlagsCache = {
 };
 export type IFlagtronConfig = {
     dependencies: string[];
-    onFlagUpdate?: (flag: IFlag) => void;
+    onFlagUpdate?: (flagEvent: IFeatureFlagEvent) => void;
     flagsmithApi: string;
     flagsmithEnvironmentId: string;
     flagtronWebsocketServer: string;

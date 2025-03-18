@@ -89,7 +89,7 @@ class Flagtron {
                         enabled: featureState.enabled,
                         value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
                     };
-                    (_c = this === null || this === void 0 ? void 0 : this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(this, this.flags[featureState.feature.name]);
+                    (_c = this === null || this === void 0 ? void 0 : this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(this, flagEvent);
                     log(`Updated flag: ${featureState.feature.name}`);
                 }
             }

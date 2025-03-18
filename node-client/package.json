@@ -1,6 +1,6 @@
 {
   "name": "flagtron",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Flagtron Node.js client",
   "repository": {
     "type": "git",
