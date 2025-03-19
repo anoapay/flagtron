@@ -20,4 +20,5 @@ export declare class Flagtron {
     initialize(): Promise<boolean>;
     getFlag(flagName: string): IFlag | undefined;
 }
+export * from "./types";
 export default Flagtron;

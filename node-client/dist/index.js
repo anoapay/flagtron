@@ -86,19 +86,23 @@ class Flagtron {
                 resolve();
             });
             _this.websocket.on("message", (data) => {
-                var _a, _b, _c;
+                var _a, _b, _c, _d;
                 try {
-                    const flagEvent = JSON.parse(data.toString());
-                    if (!((_a = flagEvent === null || flagEvent === void 0 ? void 0 : flagEvent.data) === null || _a === void 0 ? void 0 : _a.new_state)) {
+                    const encodedData = data.toString();
+                    if (encodedData === "PING") {
+                        return (_a = _this.websocket) === null || _a === void 0 ? void 0 : _a.send("PONG");
+                    }
+                    const flagEvent = JSON.parse(encodedData);
+                    if (!((_b = flagEvent === null || flagEvent === void 0 ? void 0 : flagEvent.data) === null || _b === void 0 ? void 0 : _b.new_state)) {
                         return;
                     }
                     const featureState = flagEvent.data.new_state;
                     if (_this.dependencies.has(featureState.feature.name)) {
                         _this.flags[featureState.feature.name] = {
                             enabled: featureState.enabled,
-                            value: (_b = featureState.feature_state_value) !== null && _b !== void 0 ? _b : featureState.feature.initial_value,
+                            value: (_c = featureState.feature_state_value) !== null && _c !== void 0 ? _c : featureState.feature.initial_value,
                         };
-                        (_c = _this === null || _this === void 0 ? void 0 : _this.onFlagUpdate) === null || _c === void 0 ? void 0 : _c.call(_this, Object.assign(Object.assign({}, _this.flags[featureState.feature.name]), { name: featureState.feature.name }));
+                        (_d = _this === null || _this === void 0 ? void 0 : _this.onFlagUpdate) === null || _d === void 0 ? void 0 : _d.call(_this, Object.assign(Object.assign({}, _this.flags[featureState.feature.name]), { name: featureState.feature.name }));
                     }
                 }
                 catch (error) {
