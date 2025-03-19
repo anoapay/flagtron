@@ -11,6 +11,7 @@ import {
   USE_SSL,
   SSL_CERT_PATH,
   SSL_KEY_PATH,
+  WEBSOCKET_KEEP_ALIVE_INTERVAL,
 } from "./consts";
 
 import WebhookRoute from "@/routes/webhook";
@@ -22,6 +23,10 @@ declare module "fastify" {
 }
 
 const startServer = async (globalRef: typeof global) => {
+  if (!globalRef.wsServer) {
+    throw new Error("WebSocket server is not available");
+  }
+
   const fastifyOpts: any = {
     logger: true,
   };
@@ -40,6 +45,14 @@ const startServer = async (globalRef: typeof global) => {
   });
 
   fastify.register(WebhookRoute, { prefix: "/webhook" });
+
+  globalRef.wsServer.on("connection", (ws: WebSocket) => {
+    setInterval(() => {
+      if (ws.readyState === ws.OPEN) {
+        ws.send("PING");
+      }
+    }, WEBSOCKET_KEEP_ALIVE_INTERVAL);
+  });
 
   await fastify.listen({ port: WEBHOOK_PORT, host: "0.0.0.0" });
 };

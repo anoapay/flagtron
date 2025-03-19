@@ -30,6 +30,12 @@ if (process.env.USE_SSL === "true") {
   }
 }
 
+if (!process.env.WEBSOCKET_KEEP_ALIVE_INTERVAL) {
+  log("No websocket keep alive interval provided. Defaulting to 30000");
+}
+export const WEBSOCKET_KEEP_ALIVE_INTERVAL = Number(
+  process.env.WEBSOCKET_KEEP_ALIVE_INTERVAL || 30000
+);
 export const SSL_KEY_PATH = process.env.SSL_KEY_PATH || "";
 export const SSL_CERT_PATH = process.env.SSL_CERT_PATH || "";
 export const USE_SSL = process.env.USE_SSL === "true";

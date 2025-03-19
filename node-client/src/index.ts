@@ -79,7 +79,12 @@ export class Flagtron {
 
       _this.websocket.on("message", (data: Buffer) => {
         try {
-          const flagEvent: IFeatureFlagEvent = JSON.parse(data.toString());
+          const encodedData = data.toString();
+          if (encodedData === "PING") {
+            return _this.websocket?.send("PONG");
+          }
+
+          const flagEvent: IFeatureFlagEvent = JSON.parse(encodedData);
 
           if (!flagEvent?.data?.new_state) {
             return;
@@ -178,4 +183,5 @@ export class Flagtron {
   }
 }
 
+export * from "./types";
 export default Flagtron;
